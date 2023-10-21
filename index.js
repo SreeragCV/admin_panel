@@ -1,19 +1,19 @@
 const express = require("express");
 const app = express();
 const jwt = require("jsonwebtoken");
-const noteController = require("./controller/dbcontroller");
+const userController = require("./controller/dbcontroller");
 
 app.use(express.json())
 
-app.post("/create", noteController.createUser)
+app.post("/create", userController.createUser)
 
-app.get("/allusers", noteController.getAllUsers)
+app.get("/allusers", userController.getAllUsers)
 
-app.get("/users/:id", noteController.getOneUser)
+app.get("/users/:id", userController.getOneUser)
 
-app.put("/users/:id", noteController.updateOneUser);
+app.put("/users/:id", userController.updateOneUser);
 
-app.delete("/users/:id", noteController.deleteOneUser)
+app.delete("/users/:id", userController.deleteOneUser)
 
 
 app.post('/login', (req, res) => {
