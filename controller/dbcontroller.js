@@ -13,7 +13,7 @@ exports.createUser = async (req, res) => {
       const newUser = await pool.query(`INSERT INTO Users (username, email, password) VALUES('${username}', '${email}', '${hashedPassword}');`);
       res.json(newUser.rows[0]);
       let payload = { username: username, email: email || 0 };
-      const token = jwt.sign(payload, process.env.TOKEN_SECRET);
+      const token = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
       console.log(token);
       res.status(200).json({token})
     } else {
@@ -25,12 +25,13 @@ exports.createUser = async (req, res) => {
 };
 
 exports.loginUser = async (req, res) => {
- try{ const {username, password, email} = req.body;
-  const oneUser = await pool.query(`SELECT * FROM Users WHERE username = '${username}';`);
-  const validPassword = await bcrypt.compare(password, oneUser.rows[0].password)
+ try{ const {username, password, email, roles} = req.body;
+  const user = await pool.query(`SELECT * FROM Users WHERE username = '${username}';`);
+  const validPassword = await bcrypt.compare(password, user.rows[0].password)
   if(validPassword){
+    console.log(user.rows[0].roles)
     let payload = { username: username, email: email };
-    const token = jwt.sign(payload, process.env.TOKEN_SECRET);
+    const token = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
     return res.status(200).header("auth-token", token).send({ "token": token });
   } else {
     res.json('WRONG PASSWORD')
