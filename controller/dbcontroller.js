@@ -25,12 +25,12 @@ exports.createUser = async (req, res) => {
 };
 
 exports.loginUser = async (req, res) => {
- try{ const {username, password, email, roles} = req.body;
+ try{ const {username, password, email} = req.body;
   const user = await pool.query(`SELECT * FROM Users WHERE username = '${username}';`);
   const validPassword = await bcrypt.compare(password, user.rows[0].password)
   if(validPassword){
     console.log(user.rows[0].roles)
-    let payload = { username: username, email: email };
+    let payload = { role: user.rows[0].roles , email: email };
     const token = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
     return res.status(200).header("auth-token", token).send({ "token": token });
   } else {

@@ -13,7 +13,6 @@ exports.verifyUserToken = (req, res, next) => {
     let verifiedUser = jwt.verify(token, process.env.TOKEN_SECRET);
     if (!verifiedUser) return res.status(401).send("Unauthorized request");
     req.user = verifiedUser;
-    console.log(verifiedUser);
     next();
   } catch (error) {
     res.status(400).send("Invalid Token");
@@ -21,16 +20,17 @@ exports.verifyUserToken = (req, res, next) => {
 };
 
 exports.isUser = async (req, res, next) => {
-  if (req.user.username == "Amu") {
-    console.log(req.user.username);
-    next();
+  if (req.user.role === 'user' || 'admin') {
+    console.log(req.user);
+    return next();
   }
+  console.log('NOT A USER!!!');
   return res.status(401).json("Unauthorized User!");
 };
 
 exports.isAdmin = async (req, res, next) => {
-  if (req.user.roles === 'admin') {
-    next();
+  if (req.user.role === 'admin') {
+    return next();
   }
   return res.status(401).json("Unauthorized Admin!");
 };
