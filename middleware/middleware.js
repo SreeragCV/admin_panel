@@ -20,17 +20,17 @@ exports.verifyUserToken = (req, res, next) => {
 };
 
 exports.isUser = async (req, res, next) => {
-  if (req.user.role === 'user' || 'admin') {
+  if (req.user.role === "user" || "admin") {
     console.log(req.user);
     return next();
   }
-  console.log('NOT A USER!!!');
-  return res.status(401).json("Unauthorized User!");
+  console.log("NOT A USER!!!");
+  return res.status(401).json("UNAUTHORIZED USER!!");
 };
 
 exports.isAdmin = async (req, res, next) => {
-  if (req.user.role === 'admin') {
+  if (req.user.role === "admin") {
     return next();
   }
-  return res.status(401).json("Unauthorized Admin!");
+  return res.status(401).json("ONLY ADMIN CAN DO THAT!!!");
 };

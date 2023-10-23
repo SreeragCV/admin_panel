@@ -68,7 +68,7 @@ exports.updateOneUser = async (req, res) => {
     const { id } = req.params;
     const { username } = req.body;
     const updatedNote = await pool.query(
-      `UPDATE Users SET Username = ${username} WHERE note_id=${id};`
+      `UPDATE Users SET Username = '${username}' WHERE id=${id};`
     );
     res.json("USER HAS BEEN UPDATED");
   } catch (err) {
