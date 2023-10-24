@@ -25,12 +25,12 @@ exports.createUser = async (req, res) => {
 };
 
 exports.loginUser = async (req, res) => {
- try{ const {username, password, email} = req.body;
+ try{ const {username, password} = req.body;
   const user = await pool.query(`SELECT * FROM Users WHERE username = '${username}';`);
   const validPassword = await bcrypt.compare(password, user.rows[0].password)
   if(validPassword){
-    console.log(user.rows[0].roles)
-    let payload = { role: user.rows[0].roles , email: email };
+    console.log(user.rows[0].email)
+    let payload = { role: user.rows[0].roles , email: user.rows[0].email };
     const token = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
     return res.status(200).header("auth-token", token).send({ "token": token });
   } else {
@@ -41,8 +41,6 @@ exports.loginUser = async (req, res) => {
     console.log(err);
   }
 }
-
-
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -57,6 +55,10 @@ exports.getOneUser = async (req, res) => {
   try {
     const { id } = req.params;
     const oneUser = await pool.query(`SELECT * FROM Users WHERE ID = ${id};`);
+    const data = oneUser.rows[0]
+    if(req.user.role !== "admin" && req.user.email !== data.email) {
+      return res.status(401).json({error: "NOT AUTHORIZED"})
+    }
     res.json(oneUser.rows[0]);
   } catch (err) {
     console.error(err.message);
@@ -67,9 +69,12 @@ exports.updateOneUser = async (req, res) => {
   try {
     const { id } = req.params;
     const { username } = req.body;
-    const updatedNote = await pool.query(
-      `UPDATE Users SET Username = '${username}' WHERE id=${id};`
-    );
+    const user = await pool.query(`SELECT * FROM Users WHERE ID = ${id};`)
+    const data = user.rows[0]
+    if(req.user.role !== "admin" && req.user.email !== data.email){
+      return res.status(401).json("NOT AUTHORIZED TO UPDATE")
+    }
+    const updateUser = await pool.query(`UPDATE Users SET Username = '${username}' WHERE id=${id};`);
     res.json("USER HAS BEEN UPDATED");
   } catch (err) {
     console.error(err.message);
@@ -79,7 +84,13 @@ exports.updateOneUser = async (req, res) => {
 exports.deleteOneUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const deleteNote = await pool.query(`DELETE FROM Users WHERE id = ${id};`);
+    const user = await pool.query(`SELECT * FROM Users WHERE ID = ${id};`)
+    console.log(user);
+    const data = user.rows[0]
+    if(req.user.role !== "admin" && req.user.email !== data.email){
+      return res.status(401).json("NOT AUTHORIZED")
+    }
+    const deleteUser = await pool.query(`DELETE FROM Users WHERE id = ${id};`);
     res.json("USER HAS BEEN DELETED");
   } catch (err) {
     console.error(err.message);

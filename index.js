@@ -9,13 +9,13 @@ app.post("/create", userController.createUser)
 
 app.post("/login", userController.loginUser)
 
-app.get("/allusers",verifyUserToken, isUser, userController.getAllUsers)
+app.get("/allusers",verifyUserToken, isAdmin, userController.getAllUsers)
 
 app.get("/users/:id", verifyUserToken, isUser, userController.getOneUser)
 
-app.put("/users/:id", verifyUserToken, isAdmin, userController.updateOneUser);
+app.put("/users/:id", verifyUserToken, isUser, userController.updateOneUser);
 
-app.delete("/users/:id", verifyUserToken, isAdmin, userController.deleteOneUser)
+app.delete("/users/:id", verifyUserToken, isUser, userController.deleteOneUser)
 
 
 app.listen(3000, () => {
