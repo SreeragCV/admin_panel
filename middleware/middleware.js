@@ -22,7 +22,7 @@ exports.verifyUserToken = (req, res, next) => {
 
 exports.isUser = async (req, res, next) => {
   if (req.user.role === "user" || "admin") {
-  return next();
+    return next();
   }
   console.log("NOT A USER!!!");
   return res.status(401).json("UNAUTHORIZED USER!!");
